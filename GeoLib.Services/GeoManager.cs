@@ -7,10 +7,33 @@ namespace GeoLib.Services
 {
     public class GeoManager : IGeoService
     {
+        IZipCodeRepository _ZipCodeRepository = null;
+        IStateRepository _StateRepository = null;
+
+        public GeoManager()
+        {
+        }
+
+        public GeoManager(IZipCodeRepository zipCodeRepository)
+        {
+            _ZipCodeRepository = zipCodeRepository;
+        }
+
+        public GeoManager(IStateRepository stateRepository)
+        {
+            _StateRepository = stateRepository;
+        }
+
+        public GeoManager(IZipCodeRepository zipCodeRepository, IStateRepository stateRepository)
+        {
+            _ZipCodeRepository = zipCodeRepository;
+            _StateRepository = stateRepository;
+        }
+
         public IEnumerable<string> GetStates(bool primaryOnly)
         {
             List<string> stateData = new List<string>();
-            IStateRepository stateRepository = new StateRepository();
+            IStateRepository stateRepository = _StateRepository ?? new StateRepository();
 
             IEnumerable<State> states = stateRepository.Get(primaryOnly);
 
@@ -28,7 +51,7 @@ namespace GeoLib.Services
         public ZipCodeData GetZipInfo(string zip)
         {
             ZipCodeData zipCodeData = null;
-            IZipCodeRepository zipCodeRepository = new ZipCodeRepository();
+            IZipCodeRepository zipCodeRepository = _ZipCodeRepository ?? new ZipCodeRepository();
 
             ZipCode zipCodeEntity = zipCodeRepository.GetByZip(zip);
 
@@ -48,7 +71,7 @@ namespace GeoLib.Services
         public IEnumerable<ZipCodeData> GetZips(string state)
         {
             List<ZipCodeData> zipCodeData = new List<ZipCodeData>();
-            IZipCodeRepository zipCodeRepository = new ZipCodeRepository();
+            IZipCodeRepository zipCodeRepository = _ZipCodeRepository ?? new ZipCodeRepository();
 
             var zips = zipCodeRepository.GetByState(state);
 
@@ -70,7 +93,7 @@ namespace GeoLib.Services
         public IEnumerable<ZipCodeData> GetZips(string zip, int range)
         {
             List<ZipCodeData> zipCodeData = new List<ZipCodeData>();
-            IZipCodeRepository zipCodeRepository = new ZipCodeRepository();
+            IZipCodeRepository zipCodeRepository = _ZipCodeRepository ?? new ZipCodeRepository();
 
             var zipEntity = zipCodeRepository.GetByZip(zip);
             var zips = zipCodeRepository.GetZipsForRange(zipEntity, range);
